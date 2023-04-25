@@ -13,8 +13,8 @@ Start the app using the following command, replacing the key by your API key:
 [x] Understand existing code & simplify (if needed)
 [x] Display uploaded images in "Untitled Folder"
 [ ] Allow users to create new folders
-    [ ] Create button
-    [ ] Show folders in list
-    [ ] Highlight selected folder
-    [ ] Folder switching
+    [x] Create button
+    [x] Show folders in list
+    [x] Highlight selected folder
+    [x] Folder switching
     [ ] Tie images to a folder

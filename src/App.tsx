@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useReducer, useState } from "react";
 import "./App.css";
 import AddButton from "./components/AddButton";
 import loadImage, { LoadImageResult } from "blueimp-load-image";
@@ -8,8 +8,22 @@ type Base64Image = string | undefined;
 
 type Image = { original: Base64Image; result: Base64Image };
 
+const reducer = (
+  state: Array<Image>,
+  action: { type: "add"; image: Image }
+) => {
+  switch (action.type) {
+    case "add":
+      let newState = [...state];
+      newState.push(action.image);
+      return newState;
+    default:
+      return state;
+  }
+};
+
 function App() {
-  const [images, setImages] = useState<Image[]>([]);
+  const [images, dispatch] = useReducer(reducer, []);
 
   let uploadImageToServer = (file: File) => {
     loadImage(file, {
@@ -18,13 +32,9 @@ function App() {
       canvas: true,
     })
       .then(async (imageData: LoadImageResult) => {
-        let localImage = {} as Image;
-
         let image = imageData.image as HTMLCanvasElement;
 
         let imageBase64 = image.toDataURL("image/png");
-
-        localImage.original = imageBase64;
 
         let imageBase64Data = imageBase64.replace(BASE64_IMAGE_HEADER, "");
         let data = {
@@ -47,12 +57,8 @@ function App() {
         const result = await response.json();
         const base64Result = BASE64_IMAGE_HEADER + result.result_b64;
 
-        localImage.result = base64Result;
-
-        let newImages = [...images];
-        newImages.push(localImage);
-
-        setImages(newImages);
+        let newImage = { original: imageBase64, result: base64Result };
+        dispatch({ type: "add", image: newImage });
       })
       .catch((error) => {
         console.error(error);
@@ -72,9 +78,9 @@ function App() {
       <header className="App-header">
         <AddButton onImageAdd={onImageAdd} />
 
-        {images.map((image) => {
+        {images.map((image, index) => {
           return (
-            <div>
+            <div key={index}>
               <img
                 src={image.original}
                 width={300}

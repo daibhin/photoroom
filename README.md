@@ -24,3 +24,6 @@ Start the app using the following command, replacing the key by your API key:
     [x] Add 'move' method to reducer
     [x] Filter images in active folder
     [x] Add UI to choose folder to move to
+[ ] Store application state in local storage
+    [ ] Build local storage hook
+    [ ] Migrate from `useReducer` to `useLocalStorage`

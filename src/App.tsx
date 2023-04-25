@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useReducer, useState } from "react";
+import React, { ChangeEvent, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import AddButton from "./components/AddButton";
 import loadImage, { LoadImageResult } from "blueimp-load-image";
@@ -6,6 +6,7 @@ import { API_KEY, API_URL, BASE64_IMAGE_HEADER } from "./Constants";
 import Sidebar from "./components/Sidebar";
 import ImageView from "./components/Image";
 import { Image, Folder } from "./types";
+import { useLocalStorage } from "./lib/hooks";
 
 type CreateAction = { type: "create" };
 type AddAction = { type: "add"; image: Image };
@@ -52,14 +53,19 @@ const foldersReducer = (
 };
 
 const initialFolderId = 0;
-const initialFolders = {
+const initialState = {
   activeFolderId: initialFolderId,
   folders: [{ name: "Untitled Folder", id: initialFolderId }],
   images: [],
 };
 
 function App() {
-  const [state, dispatch] = useReducer(foldersReducer, initialFolders);
+  const [localState, setLocalState] = useLocalStorage(initialState);
+  const [state, dispatch] = useReducer(foldersReducer, localState);
+
+  useEffect(() => {
+    setLocalState(state);
+  }, [state]);
 
   let uploadImageToServer = (file: File) => {
     loadImage(file, {

@@ -1,7 +1,12 @@
 type Base64Image = string | undefined;
 
-type Image = { original: Base64Image; result: Base64Image };
+type Image = {
+  id: number;
+  original: Base64Image;
+  result: Base64Image;
+  folderId: number | null;
+};
 
-type Folder = { id: number; name: string; images: Image[] };
+type Folder = { id: number; name: string };
 
 export type { Image, Folder };

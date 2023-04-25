@@ -19,7 +19,8 @@ Start the app using the following command, replacing the key by your API key:
     [x] Folder switching
     [x] Tie images to active folder
     [x] Filter images by folder
-[ ] Move images between folders
-    [ ] Remove nested images in favour of folderId on image
-    [ ] Add 'move' method to reducer
-    [ ] Add UI to choose folder to move to
+[x] Move images between folders
+    [x] Remove nested images in favour of folderId on image
+    [x] Add 'move' method to reducer
+    [x] Filter images in active folder
+    [x] Add UI to choose folder to move to

@@ -7,27 +7,18 @@ import Sidebar from "./components/Sidebar";
 import ImageView from "./components/Image";
 import { Image, Folder } from "./types";
 
-const imagesReducer = (
-  state: Array<Image>,
-  action: { type: "add"; image: Image }
-) => {
-  switch (action.type) {
-    case "add":
-      let newState = [...state];
-      newState.push(action.image);
-      return newState;
-    default:
-      return state;
-  }
-};
-
 type CreateAction = { type: "create" };
 type AddAction = { type: "add"; image: Image };
 type SelectAction = { type: "select"; id: number };
+type MoveAction = { type: "move"; imageId: number; folderId: number };
 
 const foldersReducer = (
-  state: { activeId: number; folders: Array<Folder> },
-  action: CreateAction | AddAction | SelectAction
+  state: {
+    activeFolderId: number;
+    folders: Folder[];
+    images: Image[];
+  },
+  action: CreateAction | AddAction | SelectAction | MoveAction
 ) => {
   switch (action.type) {
     case "create":
@@ -36,28 +27,25 @@ const foldersReducer = (
       newFolders.push({
         name: `Folder ${newFolders.length + 1}`,
         id: newFolders.length,
-        images: [],
       });
       return { ...state, folders: newFolders };
-    case "add":
-      let folderIndex = state.folders.findIndex(
-        (folder) => folder.id == state.activeId
-      );
-
-      if (folderIndex > -1) {
-        let folder = state.folders[folderIndex];
-        let newImages = [...folder.images];
-
-        newImages.push(action.image);
-
-        let newFolders = [...state.folders];
-        newFolders.splice(folderIndex, 1, { ...folder, images: newImages });
-
-        return { ...state, folders: newFolders };
-      }
-      return state;
+    case "add": {
+      let newImages = [...state.images];
+      let newImage = { ...action.image, folderId: state.activeFolderId };
+      newImages.push(newImage);
+      return { ...state, images: newImages };
+    }
+    case "move": {
+      let newImages = [...state.images];
+      let newImage = newImages[action.imageId];
+      newImages.splice(action.imageId, 1, {
+        ...newImage,
+        folderId: action.folderId,
+      });
+      return { ...state, images: newImages };
+    }
     case "select":
-      return { ...state, activeId: action.id };
+      return { ...state, activeFolderId: action.id };
     default:
       return state;
   }
@@ -65,8 +53,9 @@ const foldersReducer = (
 
 const initialFolderId = 0;
 const initialFolders = {
-  activeId: initialFolderId,
-  folders: [{ name: "Untitled Folder", id: initialFolderId, images: [] }],
+  activeFolderId: initialFolderId,
+  folders: [{ name: "Untitled Folder", id: initialFolderId }],
+  images: [],
 };
 
 function App() {
@@ -104,7 +93,12 @@ function App() {
         const result = await response.json();
         const base64Result = BASE64_IMAGE_HEADER + result.result_b64;
 
-        let newImage = { original: imageBase64, result: base64Result };
+        let newImage = {
+          id: images.length,
+          original: imageBase64,
+          result: base64Result,
+          folderId: null,
+        };
         dispatch({ type: "add", image: newImage });
       })
       .catch((error) => {
@@ -128,12 +122,12 @@ function App() {
     dispatch({ type: "select", id: id });
   };
 
-  let activeFolder = state.folders[state.activeId];
+  let images = state.images.filter((i) => i.folderId == state.activeFolderId);
 
   return (
     <div className="App flex h-screen">
       <Sidebar
-        activeId={state.activeId}
+        activeFolderId={state.activeFolderId}
         folders={state.folders}
         onAddFolder={handleOnAddFolder}
         onSelectFolder={handleOnSelectFolder}
@@ -143,9 +137,20 @@ function App() {
           <AddButton onImageAdd={handleOnAddImage} />
         </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-12 align-middle">
-          {activeFolder.images.map((image, index) => {
-            return <ImageView key={index} image={image} />;
+        <div className="grid grid-cols-3 gap-x-4 gap-y-12 align-middle">
+          {images.map((image, index) => {
+            return (
+              <ImageView
+                key={index}
+                image={image}
+                alternativeFolders={state.folders.filter(
+                  (f) => f.id != image.folderId
+                )}
+                onMoveFolder={(folderId: number) => {
+                  dispatch({ type: "move", folderId, imageId: image.id });
+                }}
+              />
+            );
           })}
         </div>
       </div>

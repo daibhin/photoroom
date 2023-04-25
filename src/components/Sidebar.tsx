@@ -2,12 +2,12 @@ import classNames from "../lib/styles";
 import { Folder } from "../types";
 
 export default function Sidebar({
-  activeId,
+  activeFolderId,
   folders,
   onAddFolder,
   onSelectFolder,
 }: {
-  activeId: number;
+  activeFolderId: number;
   folders: Array<Folder>;
   onAddFolder: () => void;
   onSelectFolder: (id: number) => void;
@@ -20,7 +20,7 @@ export default function Sidebar({
             <div
               className={classNames(
                 "hover:bg-red-500",
-                activeId == folder.id ? "bg-gray-100 text-bold" : ""
+                activeFolderId == folder.id ? "bg-gray-100 text-bold" : ""
               )}
               onClick={() => onSelectFolder(folder.id)}
             >

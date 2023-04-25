@@ -12,10 +12,14 @@ Start the app using the following command, replacing the key by your API key:
 [x] Run app
 [x] Understand existing code & simplify (if needed)
 [x] Display uploaded images in "Untitled Folder"
-[ ] Allow users to create new folders
+[x] Allow users to create new folders
     [x] Create button
     [x] Show folders in list
     [x] Highlight selected folder
     [x] Folder switching
     [x] Tie images to active folder
     [x] Filter images by folder
+[ ] Move images between folders
+    [ ] Remove nested images in favour of folderId on image
+    [ ] Add 'move' method to reducer
+    [ ] Add UI to choose folder to move to

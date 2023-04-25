@@ -17,4 +17,5 @@ Start the app using the following command, replacing the key by your API key:
     [x] Show folders in list
     [x] Highlight selected folder
     [x] Folder switching
-    [ ] Tie images to a folder
+    [x] Tie images to active folder
+    [x] Filter images by folder

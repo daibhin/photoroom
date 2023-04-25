@@ -21,22 +21,41 @@ const imagesReducer = (
   }
 };
 
-type AddAction = { type: "add" };
+type CreateAction = { type: "create" };
+type AddAction = { type: "add"; image: Image };
 type SelectAction = { type: "select"; id: number };
 
 const foldersReducer = (
   state: { activeId: number; folders: Array<Folder> },
-  action: AddAction | SelectAction
+  action: CreateAction | AddAction | SelectAction
 ) => {
   switch (action.type) {
-    case "add":
+    case "create":
       let newFolders = [...state.folders];
 
       newFolders.push({
         name: `Folder ${newFolders.length + 1}`,
         id: newFolders.length,
+        images: [],
       });
       return { ...state, folders: newFolders };
+    case "add":
+      let folderIndex = state.folders.findIndex(
+        (folder) => folder.id == state.activeId
+      );
+
+      if (folderIndex > -1) {
+        let folder = state.folders[folderIndex];
+        let newImages = [...folder.images];
+
+        newImages.push(action.image);
+
+        let newFolders = [...state.folders];
+        newFolders.splice(folderIndex, 1, { ...folder, images: newImages });
+
+        return { ...state, folders: newFolders };
+      }
+      return state;
     case "select":
       return { ...state, activeId: action.id };
     default:
@@ -47,12 +66,11 @@ const foldersReducer = (
 const initialFolderId = 0;
 const initialFolders = {
   activeId: initialFolderId,
-  folders: [{ name: "Untitled Folder", id: initialFolderId }],
+  folders: [{ name: "Untitled Folder", id: initialFolderId, images: [] }],
 };
 
 function App() {
-  const [images, imagesDispatch] = useReducer(imagesReducer, []);
-  const [state, foldersDispatch] = useReducer(foldersReducer, initialFolders);
+  const [state, dispatch] = useReducer(foldersReducer, initialFolders);
 
   let uploadImageToServer = (file: File) => {
     loadImage(file, {
@@ -87,7 +105,7 @@ function App() {
         const base64Result = BASE64_IMAGE_HEADER + result.result_b64;
 
         let newImage = { original: imageBase64, result: base64Result };
-        imagesDispatch({ type: "add", image: newImage });
+        dispatch({ type: "add", image: newImage });
       })
       .catch((error) => {
         console.error(error);
@@ -103,12 +121,14 @@ function App() {
   };
 
   let handleOnAddFolder = () => {
-    foldersDispatch({ type: "add" });
+    dispatch({ type: "create" });
   };
 
   let handleOnSelectFolder = (id: number) => {
-    foldersDispatch({ type: "select", id: id });
+    dispatch({ type: "select", id: id });
   };
+
+  let activeFolder = state.folders[state.activeId];
 
   return (
     <div className="App flex h-screen">
@@ -124,7 +144,7 @@ function App() {
         </div>
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-12 align-middle">
-          {images.map((image, index) => {
+          {activeFolder.images.map((image, index) => {
             return <ImageView key={index} image={image} />;
           })}
         </div>

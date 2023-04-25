@@ -8,6 +8,7 @@ import ImageView from "./components/Image";
 import { Image, Folder } from "./types";
 import { useLocalStorage } from "./lib/hooks";
 import { upload } from "./lib/api";
+import EmptyState from "./components/EmptyState";
 
 type CreateAction = { type: "create" };
 type AddAction = { type: "add"; original: string; result: string };
@@ -121,27 +122,31 @@ function App() {
         onAddFolder={handleOnAddFolder}
         onSelectFolder={handleOnSelectFolder}
       />
-      <div className="flex-1">
-        <div className="header border-b justify-end flex">
+      <div className="flex-1 p-4 space-y-16">
+        <div className="justify-end flex">
           <AddButton onImageAdd={handleOnAddImage} />
         </div>
 
-        <div className="grid grid-cols-3 gap-x-4 gap-y-12 align-middle">
-          {images.map((image, index) => {
-            return (
-              <ImageView
-                key={index}
-                image={image}
-                alternativeFolders={state.folders.filter(
-                  (f) => f.id != image.folderId
-                )}
-                onMoveFolder={(folderId: number) => {
-                  dispatch({ type: "move", folderId, imageId: image.id });
-                }}
-              />
-            );
-          })}
-        </div>
+        {images.length > 0 ? (
+          <div className="grid grid-cols-3 gap-x-4 gap-y-12 align-middle">
+            {images.map((image, index) => {
+              return (
+                <ImageView
+                  key={index}
+                  image={image}
+                  alternativeFolders={state.folders.filter(
+                    (f) => f.id != image.folderId
+                  )}
+                  onMoveFolder={(folderId: number) => {
+                    dispatch({ type: "move", folderId, imageId: image.id });
+                  }}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyState />
+        )}
       </div>
     </div>
   );

@@ -13,20 +13,16 @@ export default function Sidebar({
   onSelectFolder: (id: number) => void;
 }): JSX.Element {
   return (
-    <div className="w-[300px] border-r px-4 py-12 space-y-4">
+    <div className="w-[300px] border-r px-4 py-16 space-y-4">
       <div className="space-y-2">
         {folders.map((folder) => {
           return (
-            <div
+            <ListItem
               key={folder.id}
-              className={classNames(
-                "hover:bg-red-500",
-                activeFolderId == folder.id ? "bg-gray-100 text-bold" : ""
-              )}
+              folder={folder}
+              active={activeFolderId == folder.id}
               onClick={() => onSelectFolder(folder.id)}
-            >
-              {folder.name}
-            </div>
+            />
           );
         })}
       </div>
@@ -40,3 +36,26 @@ export default function Sidebar({
     </div>
   );
 }
+
+const ListItem = ({
+  folder,
+  active,
+  onClick,
+}: {
+  folder: Folder;
+  active: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <div
+      key={folder.id}
+      className={classNames(
+        "py-2 px-1 rounded-md cursor-pointer hover:bg-gray-100",
+        active && "bg-gray-100 font-bold"
+      )}
+      onClick={onClick}
+    >
+      {folder.name}
+    </div>
+  );
+};

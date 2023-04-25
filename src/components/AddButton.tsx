@@ -15,7 +15,7 @@ export default function AddButton({
           id="customFileAdd"
           accept=".png, .jpg, .jpeg"
         />
-        <div className="bg-gray-100 hover:bg-gray-200 m-2 px-3 py-2 rounded">
+        <div className="bg-purple-400 text-white hover:bg-purple-600 px-3 py-2 rounded font-bold">
           Upload
         </div>
       </label>

@@ -12,8 +12,18 @@ export default function ImageView({
 }): JSX.Element {
   return (
     <>
-      <img src={image.original} width={300} alt="original file uploaded" />
-      <img src={image.result} width={300} alt="result from the API" />
+      <img
+        src={image.original}
+        width={300}
+        alt="original file uploaded"
+        className="rounded-md"
+      />
+      <img
+        src={image.result}
+        width={300}
+        alt="result from the API"
+        className="rounded-md"
+      />
       <div className="flex items-center">
         <FolderSelector folders={alternativeFolders} onSelect={onMoveFolder} />
       </div>

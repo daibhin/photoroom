@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import AddButton from "./components/AddButton";
-import loadImage, { LoadImageResult } from "blueimp-load-image";
+import loadImage from "blueimp-load-image";
 import { BASE64_IMAGE_HEADER } from "./Constants";
 import Sidebar from "./components/Sidebar";
 import ImageView from "./components/Image";

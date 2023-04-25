@@ -29,7 +29,7 @@ export default function Sidebar({
 
       <button
         onClick={onAddFolder}
-        className="bg-gray-100 rounded w-full py-2 hover:bg-gray-200"
+        className="border border-gray-200 text-gray-600 text-sm font-bold rounded w-full py-2 hover:bg-gray-50"
       >
         Add folder
       </button>

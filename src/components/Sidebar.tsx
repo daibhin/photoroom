@@ -18,6 +18,7 @@ export default function Sidebar({
         {folders.map((folder) => {
           return (
             <div
+              key={folder.id}
               className={classNames(
                 "hover:bg-red-500",
                 activeFolderId == folder.id ? "bg-gray-100 text-bold" : ""

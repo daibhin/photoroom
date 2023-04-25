@@ -1,19 +1,20 @@
-import React, { ChangeEvent, useEffect, useReducer, useState } from "react";
+import { ChangeEvent, useEffect, useReducer } from "react";
 import "./App.css";
 import AddButton from "./components/AddButton";
 import loadImage, { LoadImageResult } from "blueimp-load-image";
-import { API_KEY, API_URL, BASE64_IMAGE_HEADER } from "./Constants";
+import { BASE64_IMAGE_HEADER } from "./Constants";
 import Sidebar from "./components/Sidebar";
 import ImageView from "./components/Image";
 import { Image, Folder } from "./types";
 import { useLocalStorage } from "./lib/hooks";
+import { upload } from "./lib/api";
 
 type CreateAction = { type: "create" };
-type AddAction = { type: "add"; image: Image };
+type AddAction = { type: "add"; original: string; result: string };
 type SelectAction = { type: "select"; id: number };
 type MoveAction = { type: "move"; imageId: number; folderId: number };
 
-const foldersReducer = (
+const reducer = (
   state: {
     activeFolderId: number;
     folders: Folder[];
@@ -32,8 +33,12 @@ const foldersReducer = (
       return { ...state, folders: newFolders };
     case "add": {
       let newImages = [...state.images];
-      let newImage = { ...action.image, folderId: state.activeFolderId };
-      newImages.push(newImage);
+      newImages.push({
+        id: newImages.length,
+        original: action.original,
+        result: action.result,
+        folderId: state.activeFolderId,
+      });
       return { ...state, images: newImages };
     }
     case "move": {
@@ -61,55 +66,33 @@ const initialState = {
 
 function App() {
   const [localState, setLocalState] = useLocalStorage(initialState);
-  const [state, dispatch] = useReducer(foldersReducer, localState);
+  const [state, dispatch] = useReducer(reducer, localState);
 
   useEffect(() => {
     setLocalState(state);
   }, [state]);
 
-  let uploadImageToServer = (file: File) => {
-    loadImage(file, {
-      maxWidth: 400,
-      maxHeight: 400,
-      canvas: true,
-    })
-      .then(async (imageData: LoadImageResult) => {
-        let image = imageData.image as HTMLCanvasElement;
-
-        let imageBase64 = image.toDataURL("image/png");
-
-        let imageBase64Data = imageBase64.replace(BASE64_IMAGE_HEADER, "");
-        let data = {
-          image_file_b64: imageBase64Data,
-        };
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "x-api-key": API_KEY,
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (response.status >= 400 && response.status < 600) {
-          throw new Error("Bad response from server");
-        }
-
-        const result = await response.json();
-        const base64Result = BASE64_IMAGE_HEADER + result.result_b64;
-
-        let newImage = {
-          id: images.length,
-          original: imageBase64,
-          result: base64Result,
-          folderId: null,
-        };
-        dispatch({ type: "add", image: newImage });
-      })
-      .catch((error) => {
-        console.error(error);
+  let uploadImageToServer = async (file: File) => {
+    try {
+      let imageData = await loadImage(file, {
+        maxWidth: 400,
+        maxHeight: 400,
+        canvas: true,
       });
+      let image = imageData.image as HTMLCanvasElement;
+      let imageBase64 = image.toDataURL("image/png");
+      let imageBase64Data = imageBase64.replace(BASE64_IMAGE_HEADER, "");
+
+      const result = await upload({
+        image_file_b64: imageBase64Data,
+      });
+
+      const base64Result = BASE64_IMAGE_HEADER + result.result_b64;
+
+      dispatch({ type: "add", original: imageBase64, result: base64Result });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   let handleOnAddImage = (e: ChangeEvent<HTMLInputElement>) => {

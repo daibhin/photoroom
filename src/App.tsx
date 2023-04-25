@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useReducer } from "react";
+import { ChangeEvent, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import AddButton from "./components/AddButton";
 import loadImage, { LoadImageResult } from "blueimp-load-image";
@@ -68,6 +68,7 @@ const initialState = {
 function App() {
   const [localState, setLocalState] = useLocalStorage(initialState);
   const [state, dispatch] = useReducer(reducer, localState);
+  const [uploading, setUploading] = useState<boolean>(false);
 
   useEffect(() => {
     setLocalState(state);
@@ -75,6 +76,7 @@ function App() {
 
   let uploadImageToServer = async (file: File) => {
     try {
+      setUploading(true);
       let imageData = await loadImage(file, {
         maxWidth: 400,
         maxHeight: 400,
@@ -93,6 +95,8 @@ function App() {
       dispatch({ type: "add", original: imageBase64, result: base64Result });
     } catch (error) {
       console.error(error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -124,7 +128,7 @@ function App() {
       />
       <div className="flex-1 p-4 space-y-16">
         <div className="justify-end flex">
-          <AddButton onImageAdd={handleOnAddImage} />
+          <AddButton uploading={uploading} onImageAdd={handleOnAddImage} />
         </div>
 
         {images.length > 0 ? (

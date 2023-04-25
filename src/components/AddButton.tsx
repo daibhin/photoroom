@@ -1,5 +1,4 @@
 import React, { ChangeEvent } from "react";
-import start from "../startButton.svg";
 
 export default function AddButton({
   onImageAdd,
@@ -16,7 +15,9 @@ export default function AddButton({
           id="customFileAdd"
           accept=".png, .jpg, .jpeg"
         />
-        <img src={start} alt="" className="add-button-image" />
+        <div className="bg-gray-100 hover:bg-gray-200 m-2 px-3 py-2 rounded">
+          Upload
+        </div>
       </label>
     </div>
   );

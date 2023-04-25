@@ -3,10 +3,9 @@ import "./App.css";
 import AddButton from "./components/AddButton";
 import loadImage, { LoadImageResult } from "blueimp-load-image";
 import { API_KEY, API_URL, BASE64_IMAGE_HEADER } from "./Constants";
-
-type Base64Image = string | undefined;
-
-type Image = { original: Base64Image; result: Base64Image };
+import Sidebar from "./components/Sidebar";
+import ImageView from "./components/Image";
+import { Image } from "./types";
 
 const reducer = (
   state: Array<Image>,
@@ -74,23 +73,19 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <AddButton onImageAdd={onImageAdd} />
+    <div className="App flex h-screen">
+      <Sidebar />
+      <div className="flex-1">
+        <div className="header border-b justify-end flex">
+          <AddButton onImageAdd={onImageAdd} />
+        </div>
 
-        {images.map((image, index) => {
-          return (
-            <div key={index}>
-              <img
-                src={image.original}
-                width={300}
-                alt="original file uploaded"
-              />
-              <img src={image.result} width={300} alt="result from the API" />
-            </div>
-          );
-        })}
-      </header>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-12 align-middle">
+          {images.map((image, index) => {
+            return <ImageView key={index} image={image} />;
+          })}
+        </div>
+      </div>
     </div>
   );
 }

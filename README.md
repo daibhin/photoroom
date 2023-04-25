@@ -10,7 +10,11 @@ Start the app using the following command, replacing the key by your API key:
 ## Tasks
 [x] Install NVM & v16.18.0
 [x] Run app
-[ ] Understand existing code & simplify (if needed)
-[ ] Display uploaded images in "Untitled Folder"
+[x] Understand existing code & simplify (if needed)
+[x] Display uploaded images in "Untitled Folder"
 [ ] Allow users to create new folders
-...
+    [ ] Create button
+    [ ] Show folders in list
+    [ ] Highlight selected folder
+    [ ] Folder switching
+    [ ] Tie images to a folder

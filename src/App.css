@@ -13,10 +13,6 @@
   z-index: -1;
 }
 
-.add-button-image {
-  width: 120px;
-}
-
 label.add-button-label {
   display: flex;
   margin-bottom: 0;
